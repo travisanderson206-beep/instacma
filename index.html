@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>INSTA CMA — Instant Comparative Market Analysis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* ============================================
+     CSS VARIABLES
+     ============================================ */
+  :root {
+    --abyss: #060610;
+    --void: #0A0A14;
+    --surface: #0F0F1A;
+    --surface-light: #161625;
+    --cyan: #00F5FF;
+    --cyan-dim: rgba(0, 245, 255, 0.4);
+    --cyan-ghost: rgba(0, 245, 255, 0.08);
+    --purple: #9D4EDD;
+    --purple-dim: rgba(157, 78, 221, 0.4);
+    --amber: #FF8C00;
+    --amber-dim: rgba(255, 140, 0, 0.4);
+    --text: #E0E0E0;
+    --text-dim: #888899;
+    --text-muted: #555566;
+    --glass: rgba(15, 15, 30, 0.65);
+    --glass-border: rgba(0, 245, 255, 0.12);
+    --glass-border-hover: rgba(0, 245, 255, 0.3);
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  /* ============================================
+     RESET & BASE
+     ============================================ */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--abyss);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ============================================
+     BACKGROUND EFFECTS
+     ============================================ */
+  .bg-orbs {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.2;
+    animation: orbFloat 20s ease-in-out infinite;
+  }
+
+  .orb-1 { width: 500px; height: 500px; background: var(--cyan); top: -15%; right: -5%; animation-delay: 0s; }
+  .orb-2 { width: 400px; height: 400px; background: var(--purple); bottom: -10%; left: -10%; animation-delay: -7s; }
+  .orb-3 { width: 300px; height: 300px; background: var(--amber); top: 50%; right: 30%; animation-delay: -14s; opacity: 0.1; }
+
+  @keyframes orbFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -20px) scale(1.05); }
+    66% { transform: translate(-20px, 15px) scale(0.95); }
+  }
+
+  .scanlines {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9998;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  }
+
+  .grid-bg {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.03;
+    background-image:
+      linear-gradient(var(--cyan) 1px, transparent 1px),
+      linear-gradient(90deg, var(--cyan) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* ============================================
+     LAYOUT
+     ============================================ */
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+    min-height: 100vh;
+  }
+
+  /* ============================================
+     HEADER
+     ============================================ */
+  .header {
+    text-align: center;
+    padding: 2rem 0 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .logo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.6rem;
+    font-weight: 900;
+    letter-spacing: 6px;
+    color: var(--cyan);
+    text-shadow: 0 0 20px var(--cyan-dim), 0 0 60px rgba(0, 245, 255, 0.15);
+    margin-bottom: 0.25rem;
+    position: relative;
+    display: inline-block;
+    cursor: default;
+  }
+
+  .logo:hover { animation: glitch 0.3s ease forwards; }
+
+  @keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 1px); text-shadow: 2px 0 var(--purple), -2px 0 var(--amber); }
+    40% { transform: translate(2px, -1px); text-shadow: -2px 0 var(--cyan), 2px 0 var(--purple); }
+    60% { transform: translate(-1px, 2px); }
+    80% { transform: translate(1px, -2px); text-shadow: 1px 0 var(--amber), -1px 0 var(--cyan); }
+    100% { transform: translate(0); text-shadow: 0 0 20px var(--cyan-dim), 0 0 60px rgba(0, 245, 255, 0.15); }
+  }
+
+  .tagline {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .powered-by {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 0.75rem;
+    letter-spacing: 1px;
+  }
+
+  .powered-by span { color: var(--purple); }
+
+  /* ============================================
+     GLASS CARD
+     ============================================ */
+  .glass {
+    background: var(--glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 2rem;
+  }
+
+  @supports not (backdrop-filter: blur(1px)) {
+    .glass { background: rgba(10, 10, 20, 0.95); }
+  }
+
+  /* ============================================
+     FORM
+     ============================================ */
+  .form-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .form-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--cyan-dim), transparent);
+  }
+
+  .form-group { margin-bottom: 1.25rem; }
+
+  .form-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    outline: none;
+  }
+
+  .form-input:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 0 3px rgba(0, 245, 255, 0.1), 0 0 20px rgba(0, 245, 255, 0.05);
+  }
+
+  .form-input::placeholder { color: var(--text-muted); }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  .form-type-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .type-btn {
+    padding: 0.7rem 1rem;
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: var(--radius-sm);
+    color: var(--text-dim);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+  }
+
+  .type-btn:hover { border-color: var(--cyan-dim); color: var(--text); }
+
+  .type-btn.active {
+    border-color: var(--cyan);
+    color: var(--cyan);
+    background: var(--cyan-ghost);
+    box-shadow: 0 0 15px rgba(0, 245, 255, 0.1);
+  }
+
+  .btn-analyze {
+    width: 100%;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    background: linear-gradient(135deg, var(--cyan), #00C4CC);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--abyss);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-analyze:hover:not(:disabled) {
+    box-shadow: 0 0 20px var(--cyan-dim), 0 0 60px rgba(0, 245, 255, 0.15);
+    transform: translateY(-1px);
+  }
+
+  .btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .btn-analyze::after {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
+    transform: rotate(45deg);
+    transition: 0.5s;
+    opacity: 0;
+  }
+
+  .btn-analyze:hover::after { opacity: 1; animation: btnSheen 0.75s ease; }
+
+  @keyframes btnSheen {
+    from { transform: translateX(-100%) rotate(45deg); }
+    to { transform: translateX(100%) rotate(45deg); }
+  }
+
+  /* ============================================
+     LOADING STATE
+     ============================================ */
+  .loading-section { display: none; text-align: center; padding: 3rem 2rem; }
+  .loading-section.visible { display: block; }
+
+  .radar-container {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 2rem;
+    position: relative;
+  }
+
+  .radar-ring {
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--cyan-dim);
+    border-radius: 50%;
+    animation: radarPulse 2s ease-out infinite;
+  }
+
+  .radar-ring:nth-child(2) { animation-delay: 0.5s; }
+  .radar-ring:nth-child(3) { animation-delay: 1s; }
+
+  @keyframes radarPulse {
+    0% { transform: scale(0.3); opacity: 0.8; border-color: var(--cyan); }
+    100% { transform: scale(1.5); opacity: 0; }
+  }
+
+  .radar-dot {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 8px; height: 8px;
+    background: var(--cyan);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 10px var(--cyan), 0 0 30px var(--cyan-dim);
+  }
+
+  .loading-status {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--cyan);
+    min-height: 1.5em;
+    margin-bottom: 0.5rem;
+  }
+
+  .loading-sub { font-size: 0.75rem; color: var(--text-muted); }
+
+  .progress-track {
+    width: 200px;
+    height: 2px;
+    background: var(--surface);
+    border-radius: 2px;
+    margin: 1.5rem auto 0;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    width: 30%;
+    height: 100%;
+    background: var(--cyan);
+    border-radius: 2px;
+    box-shadow: 0 0 8px var(--cyan);
+    animation: progressSweep 1.5s ease-in-out infinite;
+  }
+
+  @keyframes progressSweep {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(400%); }
+  }
+
+  /* ============================================
+     RESULTS
+     ============================================ */
+  .results-section { display: none; }
+  .results-section.visible { display: block; }
+
+  .result-property { text-align: center; margin-bottom: 2rem; }
+
+  .result-address {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 1px;
+    margin-bottom: 0.25rem;
+  }
+
+  .result-specs {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+  }
+
+  .range-card {
+    text-align: center;
+    padding: 2.5rem 2rem;
+    margin-bottom: 1.5rem;
+    border-color: var(--cyan);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .range-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+  }
+
+  .range-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    margin-bottom: 1rem;
+  }
+
+  .range-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--text);
+    text-shadow: 0 0 30px rgba(0, 245, 255, 0.2);
+    margin-bottom: 0.5rem;
+  }
+
+  .range-per-sqft {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--amber);
+  }
+
+  .range-tiers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .tier {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .tier-label {
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+  }
+
+  .tier-value {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .tier.recommended {
+    border-color: var(--cyan);
+    background: var(--cyan-ghost);
+  }
+
+  .tier.recommended .tier-label { color: var(--cyan); }
+
+  .section-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin: 2rem 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--purple-dim), transparent);
+  }
+
+  .comp-card {
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 0.75rem;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    transition: border-color 0.3s ease;
+  }
+
+  .comp-card:hover { border-color: var(--glass-border-hover); }
+
+  .comp-address { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.15rem; }
+
+  .comp-details {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .comp-rent {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--amber);
+    text-align: right;
+  }
+
+  .comp-ppsf {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-align: right;
+  }
+
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-box { text-align: center; padding: 1.25rem 1rem; }
+
+  .stat-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--cyan);
+    margin-bottom: 0.25rem;
+  }
+
+  .stat-desc {
+    font-size: 0.65rem;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .analysis-box {
+    padding: 1.5rem;
+    line-height: 1.8;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    border-left: 2px solid var(--purple);
+  }
+
+  .analysis-box strong { color: var(--text); }
+
+  /* ============================================
+     AGENT FOOTER
+     ============================================ */
+  .agent-footer {
+    text-align: center;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .agent-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.15rem; }
+  .agent-brokerage { font-size: 0.8rem; color: var(--text-dim); }
+
+  .agent-contact {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--cyan);
+    margin-top: 0.35rem;
+  }
+
+  .agent-disclaimer {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+
+  /* ============================================
+     ACTION BUTTONS
+     ============================================ */
+  .action-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .btn-secondary {
+    flex: 1;
+    padding: 0.85rem 1rem;
+    background: var(--surface);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--text-dim);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 1px;
+  }
+
+  .btn-secondary:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  /* ============================================
+     ERROR STATE
+     ============================================ */
+  .error-section { display: none; text-align: center; padding: 2rem; }
+  .error-section.visible { display: block; }
+  .error-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+  .error-msg { font-family: 'Space Mono', monospace; font-size: 0.85rem; color: #F87171; margin-bottom: 0.5rem; }
+  .error-detail { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+  /* ============================================
+     EXECUTIVE SUMMARY CARD
+     ============================================ */
+  .exec-summary-card {
+    margin-bottom: 1.5rem;
+    border-color: var(--purple);
+    position: relative;
+    overflow: hidden;
+  }
+  .exec-summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--purple), transparent);
+  }
+  .exec-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  .exec-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--purple);
+  }
+  .btn-copy {
+    padding: 0.3rem 0.8rem;
+    background: transparent;
+    border: 1px solid var(--purple-dim);
+    border-radius: 20px;
+    color: var(--purple);
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: 'Space Mono', monospace;
+  }
+  .btn-copy:hover { background: rgba(157, 78, 221, 0.1); border-color: var(--purple); }
+  .btn-copy.copied { color: #4ADE80; border-color: #4ADE80; }
+  .exec-summary-text { font-size: 0.95rem; line-height: 1.8; color: var(--text); }
+
+  /* ============================================
+     CONFIDENCE BADGE
+     ============================================ */
+  .confidence-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.3rem 0.85rem;
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 0.75rem;
+    border: 1px solid currentColor;
+  }
+  .confidence-badge.high { color: #4ADE80; background: rgba(74,222,128,0.08); border-color: rgba(74,222,128,0.4); }
+  .confidence-badge.medium { color: var(--amber); background: rgba(255,140,0,0.08); border-color: var(--amber-dim); }
+  .confidence-badge.low { color: #F87171; background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.4); }
+
+  /* ============================================
+     COMP CARD ENHANCEMENTS
+     ============================================ */
+  .comp-main { display: flex; flex-direction: column; gap: 0.25rem; }
+  .comp-notes {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+    line-height: 1.5;
+    margin-top: 0.1rem;
+  }
+  .comp-links { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
+  .comp-link {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    color: var(--cyan);
+    text-decoration: none;
+    padding: 0.15rem 0.5rem;
+    border: 1px solid var(--cyan-ghost);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+  }
+  .comp-link:hover { background: var(--cyan-ghost); border-color: var(--cyan-dim); }
+  .comp-price-col { text-align: right; flex-shrink: 0; }
+
+  /* ============================================
+     MARKET HEALTH GAUGE
+     ============================================ */
+  .market-gauge { padding: 1.5rem; margin-bottom: 1.5rem; }
+  .gauge-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .gauge-item { margin-bottom: 1rem; }
+  .gauge-item:last-child { margin-bottom: 0; }
+  .gauge-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    margin-bottom: 0.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .gauge-value { font-family: 'Space Mono', monospace; color: var(--text); }
+  .gauge-bar-track {
+    height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .gauge-bar-fill { height: 100%; border-radius: 3px; }
+  .gauge-pill {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid;
+    border-radius: 20px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+  }
+
+  /* ============================================
+     SEARCH TRANSPARENCY
+     ============================================ */
+  .transparency-section { margin-bottom: 1.5rem; }
+  .transparency-toggle {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    list-style: none;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    user-select: none;
+  }
+  .transparency-toggle::-webkit-details-marker { display: none; }
+  .transparency-toggle::before { content: '\25B6  '; font-size: 0.6rem; }
+  details[open] .transparency-toggle::before { content: '\25BC  '; }
+  .transparency-body { padding: 0 1.5rem 1.5rem; }
+  .transparency-sub {
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin: 0.75rem 0 0.5rem;
+  }
+  .transparency-query {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    padding: 0.4rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .transparency-query::before { content: '\00BB  '; color: var(--cyan); }
+  .source-link {
+    display: inline-block;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 0.2rem 0.6rem;
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 4px;
+    margin: 0.25rem 0.25rem 0 0;
+    transition: all 0.2s;
+  }
+  .source-link:hover { color: var(--cyan); border-color: var(--cyan-dim); }
+
+  /* ============================================
+     TIMESTAMP / META
+     ============================================ */
+  .analysis-meta {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* ============================================
+     PRINT — Pointe3 Branded Client Report
+     ============================================ */
+  .print-header { display: none; }
+
+  @media print {
+    :root {
+      --abyss: #ffffff;
+      --void: #f8f8f8;
+      --surface: #f0f0f0;
+      --surface-light: #e8e8e8;
+      --text: #1B2A4A;
+      --text-dim: #3a4a6a;
+      --text-muted: #6a7a9a;
+      --cyan: #1B2A4A;
+      --cyan-dim: rgba(27,42,74,0.4);
+      --cyan-ghost: rgba(27,42,74,0.06);
+      --purple: #C4A265;
+      --purple-dim: rgba(196,162,101,0.4);
+      --amber: #C4A265;
+      --amber-dim: rgba(196,162,101,0.4);
+      --glass: rgba(255,255,255,0.95);
+      --glass-border: rgba(27,42,74,0.15);
+      --glass-border-hover: rgba(27,42,74,0.3);
+    }
+
+    body { background: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    .bg-orbs, .scanlines, .grid-bg, #formSection, #loadingSection, #errorSection,
+    .action-row, .comp-links, .btn-copy, .transparency-section, .no-print { display: none !important; }
+
+    .print-header { display: block !important; text-align: center; margin-bottom: 1.5rem; }
+    .print-brand-name {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 1.6rem;
+      color: #1B2A4A;
+      font-weight: bold;
+      margin-bottom: 0.1rem;
+    }
+    .print-brand-sub { font-size: 0.8rem; color: #C4A265; letter-spacing: 2px; text-transform: uppercase; }
+    .print-agent-line { font-size: 0.8rem; color: #3a4a6a; margin-top: 0.5rem; }
+    .print-date { font-size: 0.7rem; color: #6a7a9a; }
+    .print-divider { border: none; border-top: 2px solid #1B2A4A; margin: 1rem 0 1.5rem; }
+
+    .glass {
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      background: white !important;
+      border: 1px solid rgba(27,42,74,0.15) !important;
+      box-shadow: none !important;
+    }
+
+    .logo, .range-value, .stat-number { text-shadow: none !important; }
+    .app { padding: 0.5rem; max-width: 100%; }
+    .header { padding: 0; margin-bottom: 0.5rem; }
+    .logo { color: #1B2A4A !important; font-size: 1.4rem; }
+    .tagline, .powered-by { display: none; }
+    .range-value { font-size: 1.8rem; color: #1B2A4A !important; }
+    .comp-rent { color: #C4A265 !important; }
+    .range-per-sqft { color: #C4A265 !important; }
+    .exec-summary-card { border-color: #C4A265 !important; }
+    .confidence-badge.high { color: #2a7a4a !important; border-color: #2a7a4a !important; }
+    .confidence-badge.medium { color: #C4A265 !important; border-color: #C4A265 !important; }
+    .confidence-badge.low { color: #cc4444 !important; border-color: #cc4444 !important; }
+
+    .comp-card, .range-card, .exec-summary-card, .market-gauge { page-break-inside: avoid; }
+  }
+
+  /* ============================================
+     PDF MODE — mirrors print styles for html2pdf
+     ============================================ */
+  body.pdf-mode {
+    --abyss: #ffffff;
+    --void: #f8f8f8;
+    --surface: #f0f0f0;
+    --surface-light: #e8e8e8;
+    --text: #1B2A4A;
+    --text-dim: #3a4a6a;
+    --text-muted: #6a7a9a;
+    --cyan: #1B2A4A;
+    --cyan-dim: rgba(27,42,74,0.4);
+    --cyan-ghost: rgba(27,42,74,0.06);
+    --purple: #C4A265;
+    --purple-dim: rgba(196,162,101,0.4);
+    --amber: #C4A265;
+    --amber-dim: rgba(196,162,101,0.4);
+    --glass: rgba(255,255,255,0.95);
+    --glass-border: rgba(27,42,74,0.15);
+    --glass-border-hover: rgba(27,42,74,0.3);
+    background: white !important;
+  }
+  body.pdf-mode .bg-orbs,
+  body.pdf-mode .scanlines,
+  body.pdf-mode .grid-bg,
+  body.pdf-mode .action-row,
+  body.pdf-mode .comp-links,
+  body.pdf-mode .btn-copy,
+  body.pdf-mode .transparency-section,
+  body.pdf-mode .no-print,
+  body.pdf-mode .header,
+  body.pdf-mode #formSection,
+  body.pdf-mode #loadingSection,
+  body.pdf-mode #errorSection { display: none !important; }
+  body.pdf-mode .print-header { display: block !important; text-align: center; margin-bottom: 1.5rem; }
+  body.pdf-mode .glass {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: white !important;
+    border: 1px solid rgba(27,42,74,0.15) !important;
+    box-shadow: none !important;
+  }
+  body.pdf-mode .logo,
+  body.pdf-mode .range-value,
+  body.pdf-mode .stat-number { text-shadow: none !important; }
+  body.pdf-mode .app { padding: 0.5rem; max-width: 100%; }
+  body.pdf-mode .range-value { font-size: 1.8rem; color: #1B2A4A !important; }
+  body.pdf-mode .comp-rent { color: #C4A265 !important; }
+  body.pdf-mode .range-per-sqft { color: #C4A265 !important; }
+  body.pdf-mode .exec-summary-card { border-color: #C4A265 !important; }
+  body.pdf-mode .confidence-badge.high { color: #2a7a4a !important; border-color: #2a7a4a !important; }
+  body.pdf-mode .confidence-badge.medium { color: #C4A265 !important; border-color: #C4A265 !important; }
+  body.pdf-mode .confidence-badge.low { color: #cc4444 !important; border-color: #cc4444 !important; }
+
+  /* ============================================
+     RESPONSIVE
+     ============================================ */
+  @media (max-width: 600px) {
+    .app { padding: 1rem; }
+    .logo { font-size: 1.8rem; letter-spacing: 3px; }
+    .form-row { grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; }
+    .range-value { font-size: 1.6rem; }
+    .range-tiers { grid-template-columns: 1fr; gap: 0.5rem; }
+    .stats-row { grid-template-columns: 1fr; gap: 0.5rem; }
+    .comp-card { grid-template-columns: 1fr; }
+    .comp-price-col { text-align: left; }
+    .comp-rent { text-align: left; }
+    .comp-links { flex-wrap: wrap; }
+    .glass { padding: 1.25rem; }
+    .action-row { flex-direction: column; }
+    .exec-summary-card { padding: 1.25rem; }
+    .market-gauge { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Background Effects -->
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="grid-bg"></div>
+<div class="scanlines"></div>
+
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">INSTA CMA</div>
+    <div class="tagline">Instant Comparative Market Analysis</div>
+    <div class="powered-by">Powered by <span>NEOVRSE</span> Analytics</div>
+  </header>
+
+  <!-- ========== FORM ========== -->
+  <div id="formSection" class="form-section">
+    <div class="glass">
+      <div class="form-title">Property Details</div>
+
+      <div class="form-group">
+        <label class="form-label">Property Address</label>
+        <input type="text" id="address" class="form-input" placeholder="e.g. 1234 Main St, Seattle WA 98101" autocomplete="off">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Beds</label>
+          <input type="number" id="beds" class="form-input" placeholder="3" min="0" max="20">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Baths</label>
+          <input type="number" id="baths" class="form-input" placeholder="2" min="0" max="20" step="0.25">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Sq Ft</label>
+          <input type="number" id="sqft" class="form-input" placeholder="1200" min="0">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Analysis Type</label>
+        <div class="form-type-row">
+          <button class="type-btn" data-type="rental" onclick="setType(this)">Rental Comp</button>
+          <button class="type-btn active" data-type="sale" onclick="setType(this)">Sales CMA</button>
+        </div>
+      </div>
+
+      <button id="btnAnalyze" class="btn-analyze" onclick="runAnalysis()">Analyze</button>
+    </div>
+  </div>
+
+  <!-- ========== LOADING ========== -->
+  <div id="loadingSection" class="loading-section">
+    <div class="glass">
+      <div class="radar-container">
+        <div class="radar-ring"></div>
+        <div class="radar-ring"></div>
+        <div class="radar-ring"></div>
+        <div class="radar-dot"></div>
+      </div>
+      <div id="loadingStatus" class="loading-status">Initializing...</div>
+      <div class="loading-sub">This typically takes 10-20 seconds</div>
+      <div class="progress-track">
+        <div class="progress-bar"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ERROR ========== -->
+  <div id="errorSection" class="error-section">
+    <div class="glass">
+      <div class="error-icon">&#x26A0;</div>
+      <div id="errorMsg" class="error-msg">Analysis failed</div>
+      <div id="errorDetail" class="error-detail">Please try again.</div>
+      <button class="btn-secondary" onclick="resetToForm()" style="max-width:200px;margin:0 auto;">Try Again</button>
+    </div>
+  </div>
+
+  <!-- ========== RESULTS ========== -->
+  <div id="resultsSection" class="results-section">
+
+    <!-- Print-only branding header -->
+    <div class="print-header">
+      <div class="print-brand-name">Pointe3 Real Estate</div>
+      <div class="print-brand-sub">Comparative Market Analysis</div>
+      <div class="print-agent-line">Prepared by Travis Anderson &middot; travis@pointe3.com</div>
+      <div class="print-date" id="printDate"></div>
+      <hr class="print-divider">
+    </div>
+
+    <div class="result-property">
+      <div id="resultAddress" class="result-address"></div>
+      <div id="resultSpecs" class="result-specs"></div>
+    </div>
+
+    <!-- Executive Summary -->
+    <div id="execSummaryCard" class="exec-summary-card glass" style="display:none;">
+      <div class="exec-summary-header">
+        <span class="exec-label">Executive Summary</span>
+        <button class="btn-copy" onclick="copyText('execSummaryText', this)" title="Copy for texting/email">Copy</button>
+      </div>
+      <div id="execSummaryText" class="exec-summary-text"></div>
+    </div>
+
+    <!-- Valuation Range -->
+    <div class="range-card glass">
+      <div class="range-label">Estimated Market Value</div>
+      <div id="rangeValue" class="range-value">&mdash;</div>
+      <div id="rangePpsf" class="range-per-sqft"></div>
+      <div id="confidenceBadge" class="confidence-badge" style="display:none;"></div>
+      <div class="range-tiers" id="rangeTiers"></div>
+    </div>
+
+    <!-- Market Pulse Stats -->
+    <div class="section-label">Market Pulse</div>
+    <div class="stats-row" id="statsRow"></div>
+
+    <!-- Market Health Gauge -->
+    <div id="marketGauge" class="market-gauge glass" style="display:none;"></div>
+
+    <!-- Comparable Properties -->
+    <div class="section-label">Comparable Properties</div>
+    <div id="compsContainer"></div>
+
+    <!-- Search Transparency -->
+    <details id="searchTransparency" class="transparency-section glass" style="display:none;">
+      <summary class="transparency-toggle">How We Researched This</summary>
+      <div class="transparency-body">
+        <div class="transparency-sub">Search Queries</div>
+        <div id="transparencyQueries"></div>
+        <div class="transparency-sub" style="margin-top:1rem;">Sources</div>
+        <div id="transparencySources"></div>
+      </div>
+    </details>
+
+    <!-- Market Analysis -->
+    <div class="section-label">Market Analysis</div>
+    <div class="analysis-box glass" id="analysisBox"></div>
+
+    <!-- Agent Footer -->
+    <div class="agent-footer">
+      <div class="agent-name">Travis Anderson</div>
+      <div class="agent-brokerage">Pointe3 Real Estate &middot; Seattle Rental Group</div>
+      <div class="agent-contact">travis@pointe3.com</div>
+      <div id="analysisTimestamp" class="analysis-meta" style="display:none;"></div>
+      <div class="agent-disclaimer">
+        This analysis is generated using AI-powered market data and is intended as a guide, not a formal appraisal.
+        Market conditions change rapidly. Contact your agent for a personalized assessment.
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="action-row no-print">
+      <button class="btn-secondary" onclick="window.print()">Print Report</button>
+      <button id="btnDownload" class="btn-secondary" onclick="downloadPDF()" style="display:none;">Download PDF</button>
+      <button class="btn-secondary" onclick="resetToForm()">New Analysis</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- GSAP + html2pdf -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/TextPlugin.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"></script>
+<script>
+gsap.registerPlugin(TextPlugin);
+
+// ============================================
+// CONFIG
+// ============================================
+const WEBHOOK_RENTAL = 'https://n8n.srv1150634.hstgr.cloud/webhook/rental-comps';
+const WEBHOOK_SALES = 'https://n8n.srv1150634.hstgr.cloud/webhook/sale-comps';
+const TIMEOUT_MS = 60000;
+
+let analysisType = 'sale';
+
+// ============================================
+// DOM HELPERS
+// ============================================
+const $ = id => document.getElementById(id);
+const formSection    = $('formSection');
+const loadingSection = $('loadingSection');
+const errorSection   = $('errorSection');
+const resultsSection = $('resultsSection');
+
+// ============================================
+// TYPE SELECTOR
+// ============================================
+function setType(btn) {
+  document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  analysisType = btn.dataset.type;
+}
+
+// ============================================
+// LOADING STATUS CYCLE
+// ============================================
+const statusMessages = [
+  'Scanning MLS database...',
+  'Locating comparable properties...',
+  'Analyzing market conditions...',
+  'Calculating price adjustments...',
+  'Evaluating neighborhood trends...',
+  'Compiling your report...'
+];
+
+let statusInterval;
+
+function startStatusCycle() {
+  let i = 0;
+  const el = $('loadingStatus');
+  function next() {
+    gsap.to(el, {
+      duration: 0.3, opacity: 0,
+      onComplete: () => {
+        el.textContent = statusMessages[i % statusMessages.length];
+        gsap.to(el, { duration: 0.3, opacity: 1 });
+        i++;
+      }
+    });
+  }
+  next();
+  statusInterval = setInterval(next, 3000);
+}
+
+function stopStatusCycle() { clearInterval(statusInterval); }
+
+// ============================================
+// VIEW TRANSITIONS
+// ============================================
+function showView(view) {
+  [formSection, loadingSection, errorSection, resultsSection].forEach(s => {
+    s.style.display = 'none';
+    s.classList.remove('visible');
+  });
+
+  const targets = {
+    form: formSection,
+    loading: loadingSection,
+    error: errorSection,
+    results: resultsSection
+  };
+
+  const el = targets[view];
+  if (!el) return;
+
+  if (view === 'loading') {
+    el.style.display = 'block';
+    el.classList.add('visible');
+    gsap.fromTo(el, { opacity: 0, scale: 0.95 }, { opacity: 1, scale: 1, duration: 0.5, ease: 'power2.out' });
+  } else if (view === 'results') {
+    el.style.display = 'block';
+    el.classList.add('visible');
+  } else {
+    el.style.display = 'block';
+    el.classList.add('visible');
+    gsap.fromTo(el, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' });
+  }
+}
+
+function resetToForm() {
+  stopStatusCycle();
+  showView('form');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================
+// RUN ANALYSIS
+// ============================================
+async function runAnalysis() {
+  const address = $('address').value.trim();
+  const beds    = $('beds').value;
+  const baths   = $('baths').value;
+  const sqft    = $('sqft').value;
+
+  if (!address) { $('address').focus(); return; }
+  if (!beds || !baths || !sqft) { alert('Please fill in all property details.'); return; }
+
+  const webhookUrl = analysisType === 'rental' ? WEBHOOK_RENTAL : WEBHOOK_SALES;
+  if (!webhookUrl) {
+    alert('This analysis type is not yet connected. Try the other option.');
+    return;
+  }
+
+  // Transition
+  gsap.to(formSection, {
+    opacity: 0, y: -30, duration: 0.4, ease: 'power2.in',
+    onComplete: () => {
+      showView('loading');
+      startStatusCycle();
+    }
+  });
+
+  const payload = {
+    address,
+    bedrooms: parseInt(beds),
+    bathrooms: parseFloat(baths),
+    sqft: parseInt(sqft)
+  };
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
+
+    const res = await fetch(webhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeout);
+    if (!res.ok) throw new Error('Server returned ' + res.status);
+
+    let data;
+    const ct = res.headers.get('content-type') || '';
+    if (ct.includes('json')) {
+      data = await res.json();
+    } else {
+      data = await res.text();
+    }
+
+    stopStatusCycle();
+    renderResults(payload, data);
+
+  } catch (err) {
+    stopStatusCycle();
+    let msg = 'Analysis failed';
+    let detail = 'Please check your connection and try again.';
+    if (err.name === 'AbortError') {
+      msg = 'Request timed out';
+      detail = 'The analysis took too long. Try again in a moment.';
+    } else if (err.message) {
+      detail = err.message;
+    }
+    $('errorMsg').textContent = msg;
+    $('errorDetail').textContent = detail;
+    showView('error');
+  }
+}
+
+// ============================================
+// PARSE HELPERS
+// ============================================
+function parseDollar(str) {
+  if (!str) return 0;
+  return parseInt(String(str).replace(/[$,\s]/g, '')) || 0;
+}
+
+function makeSearchLinks(address) {
+  const enc = encodeURIComponent(address);
+  return {
+    redfin: 'https://www.redfin.com/search?query=' + enc,
+    zillow: 'https://www.zillow.com/homes/' + enc + '_rb/'
+  };
+}
+
+function formatSoldDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr + 'T12:00:00');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch { return dateStr; }
+}
+
+// ============================================
+// CLIPBOARD & DOWNLOAD
+// ============================================
+function copyText(sourceId, btn) {
+  const text = $(sourceId).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+let _lastFilename = '';
+
+function downloadPDF() {
+  const btn = $('btnDownload');
+  if (btn) { btn.textContent = 'Generating PDF...'; btn.disabled = true; }
+
+  document.body.classList.add('pdf-mode');
+
+  const el = $('resultsSection');
+  const opt = {
+    margin: [0.4, 0.4, 0.4, 0.4],
+    filename: (_lastFilename || 'CMA_Report').replace('.md', '') + '.pdf',
+    image: { type: 'jpeg', quality: 0.95 },
+    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+  };
+
+  html2pdf().set(opt).from(el).save().then(function() {
+    document.body.classList.remove('pdf-mode');
+    if (btn) { btn.textContent = 'Download PDF'; btn.disabled = false; }
+  }).catch(function() {
+    document.body.classList.remove('pdf-mode');
+    if (btn) { btn.textContent = 'Download PDF'; btn.disabled = false; }
+  });
+}
+
+// ============================================
+// RENDER RESULTS
+// ============================================
+function renderResults(input, rawData) {
+  const data = (typeof rawData === 'string') ? tryParseJSON(rawData) : rawData;
+  const isStructured = data && data.analysis && typeof data.analysis === 'object';
+
+  $('resultAddress').textContent = data?.address || input.address;
+  $('resultSpecs').textContent = input.bedrooms + ' BD  /  ' + input.bathrooms + ' BA  /  ' + input.sqft.toLocaleString() + ' SQFT';
+
+  // Print date
+  const pd = $('printDate');
+  if (pd) pd.textContent = 'Generated: ' + new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  if (isStructured) {
+    renderStructured(input, data);
+  } else {
+    renderText(input, data);
+  }
+
+  showView('results');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  animateResults();
+}
+
+function tryParseJSON(str) {
+  try { return JSON.parse(str); } catch { return { raw: str }; }
+}
+
+// ============================================
+// RENDER STRUCTURED (sale-comps / rental-comps)
+// ============================================
+function renderStructured(input, data) {
+  const a = data.analysis;
+  const comps = a.comps || [];
+  const listPrice = a.recommended_list_price || a.recommended_rent || {};
+  const isSale = analysisType === 'sale';
+
+  // --- Executive Summary ---
+  const execSummary = a.executive_summary || '';
+  const execCard = $('execSummaryCard');
+  if (execSummary) {
+    $('execSummaryText').textContent = execSummary;
+    execCard.style.display = 'block';
+  } else {
+    execCard.style.display = 'none';
+  }
+
+  // --- Range card ---
+  const rangeStr = a.estimated_value || a.recommended_rent || '';
+  $('rangeValue').textContent = rangeStr || 'See analysis below';
+
+  const ppsf = a.price_per_sqft || '';
+  $('rangePpsf').textContent = ppsf ? ppsf + ' / sq ft' : '';
+
+  // --- Confidence badge ---
+  const conf = (a.confidence || '').toLowerCase();
+  const confEl = $('confidenceBadge');
+  if (conf && confEl) {
+    const labels = { high: '\u25CF High Confidence', medium: '\u25D0 Medium Confidence', low: '\u25CB Low Confidence' };
+    confEl.className = 'confidence-badge ' + conf;
+    confEl.textContent = labels[conf] || conf;
+    confEl.style.display = 'inline-flex';
+  } else if (confEl) {
+    confEl.style.display = 'none';
+  }
+
+  // --- Tiers ---
+  const conservative = parseDollar(listPrice.conservative || listPrice.low);
+  const target = parseDollar(listPrice.target || listPrice.mid);
+  const aggressive = parseDollar(listPrice.aggressive || listPrice.high);
+
+  if (conservative && target && aggressive) {
+    $('rangeTiers').innerHTML =
+      '<div class="tier"><div class="tier-label">Conservative</div><div class="tier-value" data-target="' + conservative + '">$0</div></div>' +
+      '<div class="tier recommended"><div class="tier-label">' + (isSale ? 'Target List' : 'Recommended') + '</div><div class="tier-value" data-target="' + target + '">$0</div></div>' +
+      '<div class="tier"><div class="tier-label">Aggressive</div><div class="tier-value" data-target="' + aggressive + '">$0</div></div>';
+  } else {
+    $('rangeTiers').innerHTML = '';
+  }
+
+  // --- Stats ---
+  const mc = a.market_context || {};
+  const domVal = mc.avg_dom || mc.avg_days_on_market || '\u2014';
+  const ratioVal = mc.list_to_sale_ratio || mc.sale_to_list_ratio || '\u2014';
+  const marketType = mc.market_type || '\u2014';
+
+  $('statsRow').innerHTML =
+    '<div class="stat-box glass"><div class="stat-number">' + comps.length + '</div><div class="stat-desc">Comps Found</div></div>' +
+    '<div class="stat-box glass"><div class="stat-number">' + domVal + (typeof domVal === 'number' ? ' days' : '') + '</div><div class="stat-desc">Avg Days on Market</div></div>' +
+    '<div class="stat-box glass"><div class="stat-number" style="text-transform:capitalize;">' + ratioVal + '</div><div class="stat-desc">List-to-Sale Ratio</div></div>';
+
+  // --- Market Health Gauge ---
+  buildMarketGauge(mc);
+
+  // --- Comps ---
+  const compsEl = $('compsContainer');
+  compsEl.innerHTML = '';
+
+  if (comps.length > 0) {
+    comps.forEach(c => {
+      const card = document.createElement('div');
+      card.className = 'comp-card glass';
+
+      const price = c.sold_price || c.rent || c.price || '\u2014';
+      const ppsfVal = c.price_per_sqft || '';
+      const sf = c.sqft ? c.sqft.toLocaleString() + ' sqft' : '';
+      const bd = (c.beds || '') + (c.baths ? '/' + c.baths + ' bd/ba' : '');
+      const formattedDate = formatSoldDate(c.sold_date);
+      const domText = (c.dom !== undefined && c.dom !== null && c.dom !== 'N/A') ? c.dom + ' DOM' : '';
+      const notes = c.notes || '';
+      const details = [bd, sf, formattedDate, domText].filter(Boolean).join(' \u00B7 ');
+      const links = makeSearchLinks(c.address || '');
+
+      card.innerHTML =
+        '<div class="comp-main">' +
+          '<div class="comp-address">' + (c.address || 'Unknown') + '</div>' +
+          '<div class="comp-details">' + details + '</div>' +
+          (notes ? '<div class="comp-notes">' + notes + '</div>' : '') +
+          '<div class="comp-links">' +
+            '<a href="' + links.redfin + '" target="_blank" rel="noopener" class="comp-link">Redfin</a>' +
+            '<a href="' + links.zillow + '" target="_blank" rel="noopener" class="comp-link">Zillow</a>' +
+          '</div>' +
+        '</div>' +
+        '<div class="comp-price-col">' +
+          '<div class="comp-rent">' + price + '</div>' +
+          (ppsfVal ? '<div class="comp-ppsf">' + ppsfVal + '/sqft</div>' : '') +
+        '</div>';
+      compsEl.appendChild(card);
+    });
+  } else {
+    compsEl.innerHTML = '<div class="glass" style="padding:1.5rem;text-align:center;color:var(--text-muted);font-size:0.85rem;">No comparable properties returned.</div>';
+  }
+
+  // --- Search Transparency ---
+  const queries = data.searchQueries || [];
+  const sources = data.sources || [];
+  const transEl = $('searchTransparency');
+  if ((queries.length > 0 || sources.length > 0) && transEl) {
+    transEl.style.display = 'block';
+    $('transparencyQueries').innerHTML = queries.map(function(q) {
+      return '<div class="transparency-query">' + q + '</div>';
+    }).join('');
+    $('transparencySources').innerHTML = sources.map(function(s, i) {
+      return '<a href="' + s + '" target="_blank" rel="noopener" class="source-link">Source ' + (i + 1) + '</a>';
+    }).join('');
+  } else if (transEl) {
+    transEl.style.display = 'none';
+  }
+
+  // --- Analysis text ---
+  const analysisEl = $('analysisBox');
+  const analysisText = (typeof a.analysis === 'string') ? a.analysis : (a.summary || a.narrative || '');
+  const markdown = data.markdown || '';
+
+  if (analysisText) {
+    const formatted = analysisText
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n/g, '<br>');
+    analysisEl.innerHTML = '<p>' + formatted + '</p>';
+  } else if (markdown) {
+    const cleaned = markdown
+      .replace(/#{1,3}\s+/g, '')
+      .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+    const paras = cleaned.split(/\n\n+/).filter(function(p) { return p.trim().length > 10; });
+    analysisEl.innerHTML = paras.map(function(p) { return '<p style="margin-bottom:0.75rem;">' + p.replace(/\n/g, '<br>') + '</p>'; }).join('');
+  } else {
+    analysisEl.innerHTML = '<p style="color:var(--text-muted);">Analysis data received. See comparable properties above.</p>';
+  }
+
+  // --- Download PDF ---
+  _lastFilename = data.filename || 'CMA_Report';
+  const dlBtn = $('btnDownload');
+  if (dlBtn) dlBtn.style.display = '';
+
+  // --- Timestamp & model ---
+  const tsEl = $('analysisTimestamp');
+  if (tsEl) {
+    const now = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+    const model = data.model_used || 'AI';
+    tsEl.textContent = 'Generated ' + now + ' \u00B7 ' + model;
+    tsEl.style.display = 'block';
+  }
+}
+
+// ============================================
+// MARKET HEALTH GAUGE
+// ============================================
+function buildMarketGauge(mc) {
+  const gaugeEl = $('marketGauge');
+  if (!mc || !gaugeEl) return;
+
+  const marketType = (mc.market_type || '').toLowerCase();
+  const marketColors = { seller: 'var(--cyan)', balanced: 'var(--amber)', buyer: 'var(--purple)' };
+  const marketColor = marketColors[marketType] || 'var(--text-dim)';
+
+  const domNum = parseFloat(mc.avg_dom);
+  const domPct = domNum ? Math.min(100, Math.max(5, 100 - (domNum / 90 * 100))) : null;
+
+  const ratioStr = (mc.list_to_sale_ratio || '').replace('%', '');
+  const ratioNum = parseFloat(ratioStr);
+  const ratioPct = ratioNum ? Math.min(100, Math.max(5, ((ratioNum - 95) / 7) * 100)) : null;
+
+  gaugeEl.style.display = 'block';
+  gaugeEl.innerHTML =
+    '<div class="gauge-title">Market Health</div>' +
+    '<div class="gauge-item">' +
+      '<div class="gauge-label">Market Type</div>' +
+      '<div class="gauge-pill" style="color:' + marketColor + ';border-color:' + marketColor + ';">' +
+        (marketType.charAt(0).toUpperCase() + marketType.slice(1)) + ' Market' +
+      '</div>' +
+    '</div>' +
+    (domPct !== null ?
+    '<div class="gauge-item">' +
+      '<div class="gauge-label">Avg Days on Market <span class="gauge-value">' + domNum + ' days</span></div>' +
+      '<div class="gauge-bar-track"><div class="gauge-bar-fill" data-width="' + domPct + '" style="width:0%;background:var(--cyan);"></div></div>' +
+    '</div>' : '') +
+    (ratioPct !== null ?
+    '<div class="gauge-item">' +
+      '<div class="gauge-label">List-to-Sale Ratio <span class="gauge-value">' + mc.list_to_sale_ratio + '</span></div>' +
+      '<div class="gauge-bar-track"><div class="gauge-bar-fill" data-width="' + ratioPct + '" style="width:0%;background:var(--amber);"></div></div>' +
+    '</div>' : '');
+
+  setTimeout(function() {
+    gaugeEl.querySelectorAll('.gauge-bar-fill').forEach(function(bar) {
+      gsap.to(bar, { width: bar.dataset.width + '%', duration: 1.2, ease: 'power2.out', delay: 0.3 });
+    });
+  }, 100);
+}
+
+// ============================================
+// RENDER TEXT FALLBACK
+// ============================================
+function renderText(input, data) {
+  const text = data?.raw || data?.output || data?.text || data?.message || JSON.stringify(data, null, 2);
+
+  $('execSummaryCard').style.display = 'none';
+  $('confidenceBadge').style.display = 'none';
+  $('marketGauge').style.display = 'none';
+  $('searchTransparency').style.display = 'none';
+  $('btnDownload').style.display = 'none';
+
+  $('rangeValue').textContent = 'See analysis below';
+  $('rangePpsf').textContent = '';
+  $('rangeTiers').innerHTML = '';
+
+  $('statsRow').innerHTML =
+    '<div class="stat-box glass"><div class="stat-number">\u2014</div><div class="stat-desc">Comps Found</div></div>' +
+    '<div class="stat-box glass"><div class="stat-number">\u2014</div><div class="stat-desc">Avg DOM</div></div>' +
+    '<div class="stat-box glass"><div class="stat-number">\u2014</div><div class="stat-desc">Market</div></div>';
+
+  $('compsContainer').innerHTML = '';
+
+  const analysisEl = $('analysisBox');
+  const cleaned = String(text)
+    .replace(/#{1,3}\s+/g, '')
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
+  const paras = cleaned.split(/\n\n+/).filter(function(p) { return p.trim().length > 5; });
+  analysisEl.innerHTML = paras.map(function(p) { return '<p style="margin-bottom:0.75rem;">' + p.replace(/\n/g, '<br>') + '</p>'; }).join('');
+}
+
+// ============================================
+// RESULT ANIMATIONS
+// ============================================
+function animateResults() {
+  const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+
+  tl.fromTo('.result-property', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 })
+    .fromTo('#execSummaryCard', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.2')
+    .fromTo('.range-card', { opacity: 0, y: 30, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.6 }, '-=0.3')
+    .fromTo('.section-label', { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.12 }, '-=0.3')
+    .fromTo('.stat-box', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 }, '-=0.2')
+    .fromTo('#marketGauge', { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.1')
+    .fromTo('.comp-card', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.08 }, '-=0.2')
+    .fromTo('#searchTransparency', { opacity: 0 }, { opacity: 1, duration: 0.3 }, '-=0.1')
+    .fromTo('.analysis-box', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.1')
+    .fromTo('.agent-footer', { opacity: 0 }, { opacity: 1, duration: 0.5 }, '-=0.2')
+    .fromTo('.action-row', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, '-=0.1');
+
+  // Counter animation for tier values
+  document.querySelectorAll('.tier-value[data-target]').forEach(function(el) {
+    const target = parseInt(el.dataset.target);
+    animateCounter(el, target, '$', '');
+  });
+}
+
+function animateCounter(el, target, prefix, suffix) {
+  const duration = 1200;
+  const start = performance.now();
+  requestAnimationFrame(function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(eased * target);
+    el.textContent = prefix + current.toLocaleString() + suffix;
+    if (progress < 1) requestAnimationFrame(tick);
+  });
+}
+
+// ============================================
+// INIT
+// ============================================
+gsap.fromTo('.header', { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' });
+gsap.fromTo('.form-section .glass', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.6, delay: 0.2, ease: 'power2.out' });
+
+document.querySelectorAll('.form-input').forEach(input => {
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') runAnalysis(); });
+});
+</script>
+</body>
+</html>
