@@ -538,7 +538,7 @@
   .error-detail { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; }
 
   /* ============================================
-     ADJUSTMENT SLIDERS
+     AGENT ADJUSTMENTS
      ============================================ */
   .adj-panel {
     margin-bottom: 1.5rem;
@@ -560,9 +560,7 @@
   }
   .adj-title {
     font-family: 'DM Serif Display', serif;
-    font-size: 0.65rem;
-    letter-spacing: 4px;
-    text-transform: uppercase;
+    font-size: 1rem;
     color: var(--amber);
   }
   .adj-total {
@@ -572,73 +570,49 @@
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
     border: 1px solid transparent;
-    transition: all 0.3s ease;
+    transition: all 200ms ease;
   }
-  .adj-total.positive { color: #4ADE80; border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.06); }
-  .adj-total.negative { color: #F87171; border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.06); }
+  .adj-total.positive { color: #10B981; border-color: rgba(16,185,129,0.3); background: rgba(16,185,129,0.06); }
+  .adj-total.negative { color: #EF4444; border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.06); }
   .adj-total.neutral { color: var(--text-dim); border-color: var(--glass-border); }
-  .adj-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.85rem 0;
+  .adj-category {
+    padding: 1rem 0;
     border-bottom: 1px solid rgba(255,255,255,0.04);
   }
-  .adj-item:last-child { border-bottom: none; }
-  .adj-item-left { flex: 1; }
-  .adj-item-name {
-    font-size: 0.82rem;
+  .adj-category:last-child { border-bottom: none; }
+  .adj-cat-label {
+    font-size: 0.75rem;
+    font-weight: 600;
     color: var(--text);
     margin-bottom: 0.15rem;
   }
-  .adj-item-desc {
+  .adj-cat-desc {
     font-size: 0.65rem;
     color: var(--text-muted);
+    margin-bottom: 0.6rem;
   }
-  .adj-item-right {
+  .adj-options {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-shrink: 0;
+    flex-wrap: wrap;
+    gap: 0.4rem;
   }
-  .adj-slider {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100px;
-    height: 4px;
-    background: var(--surface);
-    border-radius: 2px;
-    outline: none;
-    cursor: pointer;
-  }
-  .adj-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--amber);
-    cursor: pointer;
-    box-shadow: 0 0 6px var(--amber-dim);
-  }
-  .adj-slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--amber);
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 0 6px var(--amber-dim);
-  }
-  .adj-amount {
+  .adj-opt {
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--text-dim);
     font-family: 'Inter', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 700;
-    min-width: 70px;
-    text-align: right;
+    font-size: 0.7rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 200ms ease;
+    white-space: nowrap;
   }
-  .adj-amount.pos { color: #4ADE80; }
-  .adj-amount.neg { color: #F87171; }
-  .adj-amount.zero { color: var(--text-muted); }
+  .adj-opt:hover { border-color: var(--glass-border-hover); color: var(--text); }
+  .adj-opt.selected { border-color: var(--cyan); color: var(--text); background: var(--cyan-ghost); }
+  .adj-opt.selected.neg { border-color: #EF4444; color: #FCA5A5; background: rgba(239,68,68,0.08); }
+  .adj-opt.selected.pos { border-color: #10B981; color: #6EE7B7; background: rgba(16,185,129,0.08); }
   .adj-adjusted-range {
     text-align: center;
     margin-top: 1.25rem;
@@ -654,23 +628,20 @@
   }
   .adj-adjusted-value {
     font-family: 'DM Serif Display', serif;
-    font-size: 1.4rem;
-    font-weight: 700;
+    font-size: 1.6rem;
+    font-weight: 400;
     color: var(--amber);
   }
 
   @media (max-width: 600px) {
-    .adj-slider { width: 70px; }
-    .adj-item { flex-wrap: wrap; gap: 0.5rem; }
-    .adj-item-right { width: 100%; justify-content: space-between; }
+    .adj-options { gap: 0.3rem; }
+    .adj-opt { font-size: 0.65rem; padding: 0.3rem 0.6rem; }
   }
 
   @media print {
-    .adj-slider { display: none; }
-    .adj-panel { border-color: #C4A265 !important; }
-    .adj-amount.pos { color: #2a7a4a !important; }
-    .adj-amount.neg { color: #cc4444 !important; }
-    .adj-adjusted-value { color: #C4A265 !important; }
+    .adj-opt:not(.selected) { display: none; }
+    .adj-opt.selected { border-color: #334155; color: #0F172A; background: #F1F5F9; }
+    .adj-adjusted-value { color: #8B6914 !important; }
   }
 
   /* ============================================
@@ -934,61 +905,6 @@
   }
 
   /* ============================================
-     PDF MODE — mirrors print styles for html2pdf
-     ============================================ */
-  body.pdf-mode {
-    --abyss: #ffffff;
-    --void: #f8f8f8;
-    --surface: #f8fafc;
-    --surface-light: #f0f4f8;
-    --text: #0F172A;
-    --text-dim: #334155;
-    --text-muted: #64748B;
-    --cyan: #1B2A4A;
-    --cyan-dim: rgba(27,42,74,0.4);
-    --cyan-ghost: rgba(27,42,74,0.06);
-    --purple: #8B6914;
-    --purple-dim: rgba(139,105,20,0.4);
-    --amber: #8B6914;
-    --amber-dim: rgba(139,105,20,0.4);
-    --glass: #ffffff;
-    --glass-border: rgba(27,42,74,0.12);
-    --glass-border-hover: rgba(27,42,74,0.3);
-    background: white !important;
-  }
-  body.pdf-mode .bg-orbs,
-  body.pdf-mode .scanlines,
-  body.pdf-mode .grid-bg,
-  body.pdf-mode .action-row,
-  body.pdf-mode .comp-links,
-  body.pdf-mode .btn-copy,
-  body.pdf-mode .transparency-section,
-  body.pdf-mode .no-print,
-  body.pdf-mode .header,
-  body.pdf-mode #formSection,
-  body.pdf-mode #loadingSection,
-  body.pdf-mode #errorSection { display: none !important; }
-  body.pdf-mode .print-header { display: block !important; text-align: center; margin-bottom: 1.5rem; }
-  body.pdf-mode .glass {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: white !important;
-    border: 1px solid rgba(27,42,74,0.15) !important;
-    box-shadow: none !important;
-  }
-  body.pdf-mode .logo,
-  body.pdf-mode .range-value,
-  body.pdf-mode .stat-number { text-shadow: none !important; }
-  body.pdf-mode .app { padding: 0.5rem; max-width: 100%; }
-  body.pdf-mode .range-value { font-size: 1.8rem; color: #1B2A4A !important; }
-  body.pdf-mode .comp-rent { color: #C4A265 !important; }
-  body.pdf-mode .range-per-sqft { color: #C4A265 !important; }
-  body.pdf-mode .exec-summary-card { border-color: #C4A265 !important; }
-  body.pdf-mode .confidence-badge.high { color: #2a7a4a !important; border-color: #2a7a4a !important; }
-  body.pdf-mode .confidence-badge.medium { color: #C4A265 !important; border-color: #C4A265 !important; }
-  body.pdf-mode .confidence-badge.low { color: #cc4444 !important; border-color: #cc4444 !important; }
-
-  /* ============================================
      RESPONSIVE
      ============================================ */
   @media (max-width: 600px) {
@@ -1121,12 +1037,13 @@
     <!-- Agent Adjustments -->
     <div id="adjPanel" class="adj-panel glass" style="display:none;">
       <div class="adj-header">
-        <span class="adj-title">Agent Adjustments</span>
+        <span class="adj-title">Refine Your Estimate</span>
         <span id="adjTotal" class="adj-total neutral">$0</span>
       </div>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:1rem;">Select the options that best describe this property to adjust the AI estimate.</p>
       <div id="adjItems"></div>
       <div class="adj-adjusted-range">
-        <div class="adj-adjusted-label">Adjusted Range</div>
+        <div class="adj-adjusted-label">Adjusted Estimate</div>
         <div id="adjAdjustedValue" class="adj-adjusted-value">&mdash;</div>
       </div>
     </div>
@@ -1171,8 +1088,7 @@
 
     <!-- Actions -->
     <div class="action-row no-print">
-      <button class="btn-secondary" onclick="window.print()">Print Report</button>
-      <button id="btnDownload" class="btn-secondary" onclick="downloadPDF()" style="display:none;">Download PDF</button>
+      <button id="btnDownload" class="btn-secondary" onclick="downloadPDF()" style="display:none;">Save as PDF</button>
       <button class="btn-secondary" onclick="resetToForm()">New Analysis</button>
     </div>
   </div>
@@ -1182,7 +1098,6 @@
 <!-- GSAP + html2pdf -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/TextPlugin.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js"></script>
 <script>
 gsap.registerPlugin(TextPlugin);
 
@@ -1399,28 +1314,8 @@ function copyText(sourceId, btn) {
 let _lastFilename = '';
 
 function downloadPDF() {
-  const btn = $('btnDownload');
-  if (btn) { btn.textContent = 'Generating PDF...'; btn.disabled = true; }
-
-  document.body.classList.add('pdf-mode');
-
-  const el = $('resultsSection');
-  const opt = {
-    margin: [0.4, 0.4, 0.4, 0.4],
-    filename: (_lastFilename || 'CMA_Report').replace('.md', '') + '.pdf',
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true, backgroundColor: '#ffffff' },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-  };
-
-  html2pdf().set(opt).from(el).save().then(function() {
-    document.body.classList.remove('pdf-mode');
-    if (btn) { btn.textContent = 'Download PDF'; btn.disabled = false; }
-  }).catch(function() {
-    document.body.classList.remove('pdf-mode');
-    if (btn) { btn.textContent = 'Download PDF'; btn.disabled = false; }
-  });
+  document.title = 'CMA Report - ' + ($('resultAddress')?.textContent || 'Property') + ' - ' + new Date().toLocaleDateString();
+  window.print();
 }
 
 // ============================================
@@ -1659,19 +1554,69 @@ function buildMarketGauge(mc) {
 }
 
 // ============================================
-// ADJUSTMENT SLIDERS
+// AGENT ADJUSTMENTS
 // ============================================
-const ADJUSTMENTS = [
-  { id: 'bath',      name: 'Bathroom Count',    desc: 'Single bath vs 2+ bath comps',     min: -30000, max: 0,     step: 5000, default: 0 },
-  { id: 'condition',  name: 'Property Condition', desc: 'Original/dated vs updated/modern',  min: -40000, max: 30000, step: 5000, default: 0 },
-  { id: 'lot',       name: 'Lot Size',           desc: 'Above or below area average',       min: -10000, max: 15000, step: 2500, default: 0 },
-  { id: 'heating',   name: 'Heating System',     desc: 'Oil heat, baseboard, forced air',   min: -15000, max: 0,     step: 2500, default: 0 },
-  { id: 'parking',   name: 'Parking / Garage',   desc: 'Garage, driveway, street only',     min: -10000, max: 20000, step: 5000, default: 0 },
-  { id: 'other',     name: 'Other Factors',      desc: 'Views, noise, layout, updates',     min: -25000, max: 25000, step: 5000, default: 0 }
+const ADJ_CATEGORIES = [
+  {
+    id: 'bath', label: 'Bathrooms', desc: 'How does the bathroom count compare to most comps?',
+    options: [
+      { text: '1 bath (below market)', val: -25000 },
+      { text: '1.5 bath', val: -10000 },
+      { text: '2 bath (standard)', val: 0 },
+      { text: '3+ bath (above market)', val: 15000 }
+    ]
+  },
+  {
+    id: 'condition', label: 'Property Condition', desc: 'Overall state of the home — kitchen, baths, flooring, systems.',
+    options: [
+      { text: 'Needs major work', val: -40000 },
+      { text: 'Original / dated', val: -20000 },
+      { text: 'Average / well-maintained', val: 0 },
+      { text: 'Recently updated', val: 20000 },
+      { text: 'Fully renovated', val: 40000 }
+    ]
+  },
+  {
+    id: 'lot', label: 'Lot Size', desc: 'Compared to neighboring properties.',
+    options: [
+      { text: 'Smaller than average', val: -8000 },
+      { text: 'Average', val: 0 },
+      { text: 'Larger than average', val: 10000 },
+      { text: 'Oversized / development potential', val: 20000 }
+    ]
+  },
+  {
+    id: 'heating', label: 'Heating System', desc: 'Buyers factor in conversion costs for older systems.',
+    options: [
+      { text: 'Oil heat', val: -12000 },
+      { text: 'Baseboard electric', val: -5000 },
+      { text: 'Forced air / heat pump', val: 0 },
+      { text: 'Mini-split / modern', val: 5000 }
+    ]
+  },
+  {
+    id: 'parking', label: 'Parking', desc: 'Garage, driveway, or street parking only.',
+    options: [
+      { text: 'Street parking only', val: -8000 },
+      { text: 'Driveway / pad', val: 0 },
+      { text: '1-car garage', val: 10000 },
+      { text: '2-car garage', val: 18000 }
+    ]
+  },
+  {
+    id: 'features', label: 'Special Features', desc: 'Standout positives or negatives not captured above.',
+    options: [
+      { text: 'Busy road / noise', val: -15000 },
+      { text: 'No standout features', val: 0 },
+      { text: 'Great views / light', val: 10000 },
+      { text: 'ADU / rental income', val: 30000 }
+    ]
+  }
 ];
 
 let _adjBaseLow = 0;
 let _adjBaseHigh = 0;
+let _adjSelections = {};
 
 function buildAdjustmentPanel(low, high) {
   const panel = $('adjPanel');
@@ -1679,52 +1624,53 @@ function buildAdjustmentPanel(low, high) {
 
   _adjBaseLow = low;
   _adjBaseHigh = high;
+  _adjSelections = {};
+
+  // Pre-select the $0 (standard/average) option for each category
+  ADJ_CATEGORIES.forEach(function(cat) {
+    var defaultOpt = cat.options.find(function(o) { return o.val === 0; });
+    if (defaultOpt) _adjSelections[cat.id] = 0;
+  });
+
   panel.style.display = 'block';
 
-  const container = $('adjItems');
-  container.innerHTML = ADJUSTMENTS.map(function(adj) {
-    return '<div class="adj-item">' +
-      '<div class="adj-item-left">' +
-        '<div class="adj-item-name">' + adj.name + '</div>' +
-        '<div class="adj-item-desc">' + adj.desc + '</div>' +
-      '</div>' +
-      '<div class="adj-item-right">' +
-        '<input type="range" class="adj-slider" id="adj_' + adj.id + '" ' +
-          'min="' + adj.min + '" max="' + adj.max + '" step="' + adj.step + '" value="' + adj.default + '" ' +
-          'oninput="updateAdjustments()">' +
-        '<span class="adj-amount zero" id="adj_val_' + adj.id + '">$0</span>' +
+  var container = $('adjItems');
+  container.innerHTML = ADJ_CATEGORIES.map(function(cat) {
+    return '<div class="adj-category">' +
+      '<div class="adj-cat-label">' + cat.label + '</div>' +
+      '<div class="adj-cat-desc">' + cat.desc + '</div>' +
+      '<div class="adj-options">' +
+        cat.options.map(function(opt) {
+          var cls = 'adj-opt';
+          if (opt.val === 0) cls += ' selected';
+          if (opt.val < 0) cls += ' neg';
+          if (opt.val > 0) cls += ' pos';
+          return '<button class="' + cls + '" data-cat="' + cat.id + '" data-val="' + opt.val + '" onclick="selectAdj(this)">' + opt.text + '</button>';
+        }).join('') +
       '</div>' +
     '</div>';
   }).join('');
 
-  updateAdjustments();
+  recalcAdjustments();
 }
 
-function updateAdjustments() {
-  let total = 0;
+function selectAdj(btn) {
+  var cat = btn.dataset.cat;
+  var val = parseInt(btn.dataset.val);
 
-  ADJUSTMENTS.forEach(function(adj) {
-    const slider = $('adj_' + adj.id);
-    const label = $('adj_val_' + adj.id);
-    if (!slider || !label) return;
+  // Deselect siblings
+  btn.parentElement.querySelectorAll('.adj-opt').forEach(function(b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
 
-    const val = parseInt(slider.value);
-    total += val;
+  _adjSelections[cat] = val;
+  recalcAdjustments();
+}
 
-    if (val > 0) {
-      label.textContent = '+$' + val.toLocaleString();
-      label.className = 'adj-amount pos';
-    } else if (val < 0) {
-      label.textContent = '-$' + Math.abs(val).toLocaleString();
-      label.className = 'adj-amount neg';
-    } else {
-      label.textContent = '$0';
-      label.className = 'adj-amount zero';
-    }
-  });
+function recalcAdjustments() {
+  var total = 0;
+  Object.keys(_adjSelections).forEach(function(k) { total += _adjSelections[k]; });
 
-  // Update total badge
-  const totalEl = $('adjTotal');
+  var totalEl = $('adjTotal');
   if (total > 0) {
     totalEl.textContent = '+$' + total.toLocaleString();
     totalEl.className = 'adj-total positive';
@@ -1736,10 +1682,9 @@ function updateAdjustments() {
     totalEl.className = 'adj-total neutral';
   }
 
-  // Update adjusted range
-  const adjLow = _adjBaseLow + total;
-  const adjHigh = _adjBaseHigh + total;
-  const adjEl = $('adjAdjustedValue');
+  var adjLow = _adjBaseLow + total;
+  var adjHigh = _adjBaseHigh + total;
+  var adjEl = $('adjAdjustedValue');
   if (adjEl) {
     adjEl.textContent = '$' + adjLow.toLocaleString() + ' \u2014 $' + adjHigh.toLocaleString();
   }
