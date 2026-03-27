@@ -642,6 +642,142 @@
   .error-detail { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; }
 
   /* ============================================
+     ADJUSTMENT SLIDERS
+     ============================================ */
+  .adj-panel {
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .adj-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+  }
+  .adj-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+  .adj-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--amber);
+  }
+  .adj-total {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+  }
+  .adj-total.positive { color: #4ADE80; border-color: rgba(74,222,128,0.3); background: rgba(74,222,128,0.06); }
+  .adj-total.negative { color: #F87171; border-color: rgba(248,113,113,0.3); background: rgba(248,113,113,0.06); }
+  .adj-total.neutral { color: var(--text-dim); border-color: var(--glass-border); }
+  .adj-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .adj-item:last-child { border-bottom: none; }
+  .adj-item-left { flex: 1; }
+  .adj-item-name {
+    font-size: 0.82rem;
+    color: var(--text);
+    margin-bottom: 0.15rem;
+  }
+  .adj-item-desc {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+  }
+  .adj-item-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-shrink: 0;
+  }
+  .adj-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100px;
+    height: 4px;
+    background: var(--surface);
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+  }
+  .adj-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--amber);
+    cursor: pointer;
+    box-shadow: 0 0 6px var(--amber-dim);
+  }
+  .adj-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--amber);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 6px var(--amber-dim);
+  }
+  .adj-amount {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    min-width: 70px;
+    text-align: right;
+  }
+  .adj-amount.pos { color: #4ADE80; }
+  .adj-amount.neg { color: #F87171; }
+  .adj-amount.zero { color: var(--text-muted); }
+  .adj-adjusted-range {
+    text-align: center;
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .adj-adjusted-label {
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.4rem;
+  }
+  .adj-adjusted-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--amber);
+  }
+
+  @media (max-width: 600px) {
+    .adj-slider { width: 70px; }
+    .adj-item { flex-wrap: wrap; gap: 0.5rem; }
+    .adj-item-right { width: 100%; justify-content: space-between; }
+  }
+
+  @media print {
+    .adj-slider { display: none; }
+    .adj-panel { border-color: #C4A265 !important; }
+    .adj-amount.pos { color: #2a7a4a !important; }
+    .adj-amount.neg { color: #cc4444 !important; }
+    .adj-adjusted-value { color: #C4A265 !important; }
+  }
+
+  /* ============================================
      EXECUTIVE SUMMARY CARD
      ============================================ */
   .exec-summary-card {
@@ -1096,6 +1232,19 @@
       <div class="range-tiers" id="rangeTiers"></div>
     </div>
 
+    <!-- Agent Adjustments -->
+    <div id="adjPanel" class="adj-panel glass" style="display:none;">
+      <div class="adj-header">
+        <span class="adj-title">Agent Adjustments</span>
+        <span id="adjTotal" class="adj-total neutral">$0</span>
+      </div>
+      <div id="adjItems"></div>
+      <div class="adj-adjusted-range">
+        <div class="adj-adjusted-label">Adjusted Range</div>
+        <div id="adjAdjustedValue" class="adj-adjusted-value">&mdash;</div>
+      </div>
+    </div>
+
     <!-- Market Pulse Stats -->
     <div class="section-label">Market Pulse</div>
     <div class="stats-row" id="statsRow"></div>
@@ -1469,6 +1618,9 @@ function renderStructured(input, data) {
     $('rangeTiers').innerHTML = '';
   }
 
+  // --- Adjustment Sliders ---
+  buildAdjustmentPanel(conservative, aggressive);
+
   // --- Stats ---
   const mc = a.market_context || {};
   const domVal = mc.avg_dom || mc.avg_days_on_market || '\u2014';
@@ -1621,6 +1773,93 @@ function buildMarketGauge(mc) {
 }
 
 // ============================================
+// ADJUSTMENT SLIDERS
+// ============================================
+const ADJUSTMENTS = [
+  { id: 'bath',      name: 'Bathroom Count',    desc: 'Single bath vs 2+ bath comps',     min: -30000, max: 0,     step: 5000, default: 0 },
+  { id: 'condition',  name: 'Property Condition', desc: 'Original/dated vs updated/modern',  min: -40000, max: 30000, step: 5000, default: 0 },
+  { id: 'lot',       name: 'Lot Size',           desc: 'Above or below area average',       min: -10000, max: 15000, step: 2500, default: 0 },
+  { id: 'heating',   name: 'Heating System',     desc: 'Oil heat, baseboard, forced air',   min: -15000, max: 0,     step: 2500, default: 0 },
+  { id: 'parking',   name: 'Parking / Garage',   desc: 'Garage, driveway, street only',     min: -10000, max: 20000, step: 5000, default: 0 },
+  { id: 'other',     name: 'Other Factors',      desc: 'Views, noise, layout, updates',     min: -25000, max: 25000, step: 5000, default: 0 }
+];
+
+let _adjBaseLow = 0;
+let _adjBaseHigh = 0;
+
+function buildAdjustmentPanel(low, high) {
+  const panel = $('adjPanel');
+  if (!panel || !low || !high) { if (panel) panel.style.display = 'none'; return; }
+
+  _adjBaseLow = low;
+  _adjBaseHigh = high;
+  panel.style.display = 'block';
+
+  const container = $('adjItems');
+  container.innerHTML = ADJUSTMENTS.map(function(adj) {
+    return '<div class="adj-item">' +
+      '<div class="adj-item-left">' +
+        '<div class="adj-item-name">' + adj.name + '</div>' +
+        '<div class="adj-item-desc">' + adj.desc + '</div>' +
+      '</div>' +
+      '<div class="adj-item-right">' +
+        '<input type="range" class="adj-slider" id="adj_' + adj.id + '" ' +
+          'min="' + adj.min + '" max="' + adj.max + '" step="' + adj.step + '" value="' + adj.default + '" ' +
+          'oninput="updateAdjustments()">' +
+        '<span class="adj-amount zero" id="adj_val_' + adj.id + '">$0</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  updateAdjustments();
+}
+
+function updateAdjustments() {
+  let total = 0;
+
+  ADJUSTMENTS.forEach(function(adj) {
+    const slider = $('adj_' + adj.id);
+    const label = $('adj_val_' + adj.id);
+    if (!slider || !label) return;
+
+    const val = parseInt(slider.value);
+    total += val;
+
+    if (val > 0) {
+      label.textContent = '+$' + val.toLocaleString();
+      label.className = 'adj-amount pos';
+    } else if (val < 0) {
+      label.textContent = '-$' + Math.abs(val).toLocaleString();
+      label.className = 'adj-amount neg';
+    } else {
+      label.textContent = '$0';
+      label.className = 'adj-amount zero';
+    }
+  });
+
+  // Update total badge
+  const totalEl = $('adjTotal');
+  if (total > 0) {
+    totalEl.textContent = '+$' + total.toLocaleString();
+    totalEl.className = 'adj-total positive';
+  } else if (total < 0) {
+    totalEl.textContent = '-$' + Math.abs(total).toLocaleString();
+    totalEl.className = 'adj-total negative';
+  } else {
+    totalEl.textContent = '$0';
+    totalEl.className = 'adj-total neutral';
+  }
+
+  // Update adjusted range
+  const adjLow = _adjBaseLow + total;
+  const adjHigh = _adjBaseHigh + total;
+  const adjEl = $('adjAdjustedValue');
+  if (adjEl) {
+    adjEl.textContent = '$' + adjLow.toLocaleString() + ' \u2014 $' + adjHigh.toLocaleString();
+  }
+}
+
+// ============================================
 // RENDER TEXT FALLBACK
 // ============================================
 function renderText(input, data) {
@@ -1628,6 +1867,7 @@ function renderText(input, data) {
 
   $('execSummaryCard').style.display = 'none';
   $('confidenceBadge').style.display = 'none';
+  $('adjPanel').style.display = 'none';
   $('marketGauge').style.display = 'none';
   $('searchTransparency').style.display = 'none';
   $('btnDownload').style.display = 'none';
@@ -1662,6 +1902,7 @@ function animateResults() {
   tl.fromTo('.result-property', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 })
     .fromTo('#execSummaryCard', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.2')
     .fromTo('.range-card', { opacity: 0, y: 30, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.6 }, '-=0.3')
+    .fromTo('#adjPanel', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.2')
     .fromTo('.section-label', { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.12 }, '-=0.3')
     .fromTo('.stat-box', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 }, '-=0.2')
     .fromTo('#marketGauge', { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.1')
