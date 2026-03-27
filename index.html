@@ -5,29 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>INSTA CMA — Instant Comparative Market Analysis</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
   /* ============================================
      CSS VARIABLES
      ============================================ */
   :root {
-    --abyss: #060610;
-    --void: #0A0A14;
-    --surface: #0F0F1A;
-    --surface-light: #161625;
-    --cyan: #00F5FF;
-    --cyan-dim: rgba(0, 245, 255, 0.4);
-    --cyan-ghost: rgba(0, 245, 255, 0.08);
-    --purple: #9D4EDD;
-    --purple-dim: rgba(157, 78, 221, 0.4);
-    --amber: #FF8C00;
-    --amber-dim: rgba(255, 140, 0, 0.4);
-    --text: #E0E0E0;
-    --text-dim: #888899;
-    --text-muted: #555566;
-    --glass: rgba(15, 15, 30, 0.65);
-    --glass-border: rgba(0, 245, 255, 0.12);
-    --glass-border-hover: rgba(0, 245, 255, 0.3);
+    --abyss: #0A0E1A;
+    --void: #0D1220;
+    --surface: #111827;
+    --surface-light: #1C2333;
+    --cyan: #3B82F6;
+    --cyan-dim: rgba(59, 130, 246, 0.3);
+    --cyan-ghost: rgba(59, 130, 246, 0.08);
+    --purple: #C5A880;
+    --purple-dim: rgba(197, 168, 128, 0.3);
+    --amber: #C5A880;
+    --amber-dim: rgba(197, 168, 128, 0.3);
+    --text: #F1F5F9;
+    --text-dim: #94A3B8;
+    --text-muted: #475569;
+    --glass: rgba(17, 24, 39, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.07);
+    --glass-border-hover: rgba(255, 255, 255, 0.15);
     --radius: 12px;
     --radius-sm: 8px;
   }
@@ -47,59 +47,8 @@
   }
 
   /* ============================================
-     BACKGROUND EFFECTS
+     BACKGROUND
      ============================================ */
-  .bg-orbs {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
-  }
-
-  .orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(100px);
-    opacity: 0.2;
-    animation: orbFloat 20s ease-in-out infinite;
-  }
-
-  .orb-1 { width: 500px; height: 500px; background: var(--cyan); top: -15%; right: -5%; animation-delay: 0s; }
-  .orb-2 { width: 400px; height: 400px; background: var(--purple); bottom: -10%; left: -10%; animation-delay: -7s; }
-  .orb-3 { width: 300px; height: 300px; background: var(--amber); top: 50%; right: 30%; animation-delay: -14s; opacity: 0.1; }
-
-  @keyframes orbFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(30px, -20px) scale(1.05); }
-    66% { transform: translate(-20px, 15px) scale(0.95); }
-  }
-
-  .scanlines {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 9998;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0, 0, 0, 0.03) 2px,
-      rgba(0, 0, 0, 0.03) 4px
-    );
-  }
-
-  .grid-bg {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.03;
-    background-image:
-      linear-gradient(var(--cyan) 1px, transparent 1px),
-      linear-gradient(90deg, var(--cyan) 1px, transparent 1px);
-    background-size: 60px 60px;
-  }
 
   /* ============================================
      LAYOUT
@@ -123,33 +72,19 @@
   }
 
   .logo {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 2.6rem;
-    font-weight: 900;
-    letter-spacing: 6px;
-    color: var(--cyan);
-    text-shadow: 0 0 20px var(--cyan-dim), 0 0 60px rgba(0, 245, 255, 0.15);
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.4rem;
+    font-weight: 400;
+    letter-spacing: 2px;
+    color: var(--text);
     margin-bottom: 0.25rem;
-    position: relative;
-    display: inline-block;
-    cursor: default;
-  }
-
-  .logo:hover { animation: glitch 0.3s ease forwards; }
-
-  @keyframes glitch {
-    0% { transform: translate(0); }
-    20% { transform: translate(-2px, 1px); text-shadow: 2px 0 var(--purple), -2px 0 var(--amber); }
-    40% { transform: translate(2px, -1px); text-shadow: -2px 0 var(--cyan), 2px 0 var(--purple); }
-    60% { transform: translate(-1px, 2px); }
-    80% { transform: translate(1px, -2px); text-shadow: 1px 0 var(--amber), -1px 0 var(--cyan); }
-    100% { transform: translate(0); text-shadow: 0 0 20px var(--cyan-dim), 0 0 60px rgba(0, 245, 255, 0.15); }
   }
 
   .tagline {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.7rem;
-    letter-spacing: 4px;
+    font-weight: 500;
+    letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--text-dim);
   }
@@ -161,29 +96,24 @@
     letter-spacing: 1px;
   }
 
-  .powered-by span { color: var(--purple); }
+  .powered-by span { color: var(--amber); }
 
   /* ============================================
      GLASS CARD
      ============================================ */
   .glass {
-    background: var(--glass);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    background: var(--surface);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius);
     padding: 2rem;
-  }
-
-  @supports not (backdrop-filter: blur(1px)) {
-    .glass { background: rgba(10, 10, 20, 0.95); }
+    transition: border-color 200ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   /* ============================================
      FORM
      ============================================ */
   .form-title {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 0.8rem;
     letter-spacing: 3px;
     text-transform: uppercase;
@@ -272,45 +202,25 @@
     width: 100%;
     padding: 1rem;
     margin-top: 0.5rem;
-    background: linear-gradient(135deg, var(--cyan), #00C4CC);
+    background: var(--cyan);
     border: none;
     border-radius: var(--radius-sm);
-    color: var(--abyss);
-    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
     font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 3px;
+    font-weight: 600;
+    letter-spacing: 2px;
     text-transform: uppercase;
     cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .btn-analyze:hover:not(:disabled) {
-    box-shadow: 0 0 20px var(--cyan-dim), 0 0 60px rgba(0, 245, 255, 0.15);
     transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
   }
 
   .btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; }
-
-  .btn-analyze::after {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: linear-gradient(transparent, rgba(255,255,255,0.1), transparent);
-    transform: rotate(45deg);
-    transition: 0.5s;
-    opacity: 0;
-  }
-
-  .btn-analyze:hover::after { opacity: 1; animation: btnSheen 0.75s ease; }
-
-  @keyframes btnSheen {
-    from { transform: translateX(-100%) rotate(45deg); }
-    to { transform: translateX(100%) rotate(45deg); }
-  }
 
   /* ============================================
      LOADING STATE
@@ -318,41 +228,28 @@
   .loading-section { display: none; text-align: center; padding: 3rem 2rem; }
   .loading-section.visible { display: block; }
 
-  .radar-container {
-    width: 120px;
-    height: 120px;
+  .spinner-container {
+    width: 48px;
+    height: 48px;
     margin: 0 auto 2rem;
     position: relative;
   }
 
-  .radar-ring {
-    position: absolute;
-    inset: 0;
-    border: 1px solid var(--cyan-dim);
+  .spinner {
+    width: 48px;
+    height: 48px;
+    border: 2px solid var(--glass-border);
+    border-top-color: var(--cyan);
     border-radius: 50%;
-    animation: radarPulse 2s ease-out infinite;
+    animation: spin 1s linear infinite;
   }
 
-  .radar-ring:nth-child(2) { animation-delay: 0.5s; }
-  .radar-ring:nth-child(3) { animation-delay: 1s; }
-
-  @keyframes radarPulse {
-    0% { transform: scale(0.3); opacity: 0.8; border-color: var(--cyan); }
-    100% { transform: scale(1.5); opacity: 0; }
-  }
-
-  .radar-dot {
-    position: absolute;
-    top: 50%; left: 50%;
-    width: 8px; height: 8px;
-    background: var(--cyan);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    box-shadow: 0 0 10px var(--cyan), 0 0 30px var(--cyan-dim);
+  @keyframes spin {
+    to { transform: rotate(360deg); }
   }
 
   .loading-status {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.85rem;
     color: var(--cyan);
     min-height: 1.5em;
@@ -393,7 +290,7 @@
   .result-property { text-align: center; margin-bottom: 2rem; }
 
   .result-address {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--text);
@@ -402,7 +299,7 @@
   }
 
   .result-specs {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.75rem;
     color: var(--text-dim);
     letter-spacing: 2px;
@@ -422,11 +319,11 @@
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
   }
 
   .range-label {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 0.65rem;
     letter-spacing: 4px;
     text-transform: uppercase;
@@ -435,18 +332,17 @@
   }
 
   .range-value {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 2.2rem;
-    font-weight: 900;
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.8rem;
+    font-weight: 400;
     color: var(--text);
-    text-shadow: 0 0 30px rgba(0, 245, 255, 0.2);
     margin-bottom: 0.5rem;
   }
 
   .range-per-sqft {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.8rem;
-    color: var(--amber);
+    color: var(--text-dim);
   }
 
   .range-tiers {
@@ -472,7 +368,7 @@
   }
 
   .tier-value {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--text);
@@ -486,7 +382,7 @@
   .tier.recommended .tier-label { color: var(--cyan); }
 
   .section-label {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 0.7rem;
     letter-spacing: 3px;
     text-transform: uppercase;
@@ -514,12 +410,12 @@
     transition: border-color 0.3s ease;
   }
 
-  .comp-card:hover { border-color: var(--glass-border-hover); }
+  .comp-card:hover { border-color: var(--glass-border-hover); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
 
   .comp-address { font-weight: 600; font-size: 0.9rem; margin-bottom: 0.15rem; }
 
   .comp-details {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.7rem;
     color: var(--text-dim);
     display: flex;
@@ -528,15 +424,15 @@
   }
 
   .comp-rent {
-    font-family: 'Space Mono', monospace;
+    font-family: 'DM Serif Display', serif;
     font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--amber);
+    font-weight: 400;
+    color: var(--text);
     text-align: right;
   }
 
   .comp-ppsf {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.7rem;
     color: var(--text-muted);
     text-align: right;
@@ -552,10 +448,10 @@
   .stat-box { text-align: center; padding: 1.25rem 1rem; }
 
   .stat-number {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 1.4rem;
     font-weight: 700;
-    color: var(--cyan);
+    color: var(--text);
     margin-bottom: 0.25rem;
   }
 
@@ -590,7 +486,7 @@
   .agent-brokerage { font-size: 0.8rem; color: var(--text-dim); }
 
   .agent-contact {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.75rem;
     color: var(--cyan);
     margin-top: 0.35rem;
@@ -638,7 +534,7 @@
   .error-section { display: none; text-align: center; padding: 2rem; }
   .error-section.visible { display: block; }
   .error-icon { font-size: 2.5rem; margin-bottom: 1rem; }
-  .error-msg { font-family: 'Space Mono', monospace; font-size: 0.85rem; color: #F87171; margin-bottom: 0.5rem; }
+  .error-msg { font-family: 'Inter', sans-serif; font-size: 0.85rem; color: #F87171; margin-bottom: 0.5rem; }
   .error-detail { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.5rem; }
 
   /* ============================================
@@ -663,14 +559,14 @@
     margin-bottom: 1.25rem;
   }
   .adj-title {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 0.65rem;
     letter-spacing: 4px;
     text-transform: uppercase;
     color: var(--amber);
   }
   .adj-total {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.85rem;
     font-weight: 700;
     padding: 0.25rem 0.75rem;
@@ -734,7 +630,7 @@
     box-shadow: 0 0 6px var(--amber-dim);
   }
   .adj-amount {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.75rem;
     font-weight: 700;
     min-width: 70px;
@@ -757,7 +653,7 @@
     margin-bottom: 0.4rem;
   }
   .adj-adjusted-value {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 1.4rem;
     font-weight: 700;
     color: var(--amber);
@@ -800,7 +696,7 @@
     margin-bottom: 1rem;
   }
   .exec-label {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 0.65rem;
     letter-spacing: 4px;
     text-transform: uppercase;
@@ -816,7 +712,7 @@
     letter-spacing: 1px;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
   }
   .btn-copy:hover { background: rgba(157, 78, 221, 0.1); border-color: var(--purple); }
   .btn-copy.copied { color: #4ADE80; border-color: #4ADE80; }
@@ -831,7 +727,7 @@
     gap: 0.4rem;
     padding: 0.3rem 0.85rem;
     border-radius: 20px;
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.7rem;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -855,18 +751,18 @@
   }
   .comp-links { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
   .comp-link {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.65rem;
-    letter-spacing: 1px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
     color: var(--cyan);
     text-decoration: none;
-    padding: 0.15rem 0.5rem;
-    border: 1px solid var(--cyan-ghost);
+    padding: 0.2rem 0.6rem;
+    border: 1px solid var(--glass-border);
     border-radius: 4px;
-    transition: all 0.2s ease;
-    text-transform: uppercase;
+    transition: all 200ms ease;
   }
-  .comp-link:hover { background: var(--cyan-ghost); border-color: var(--cyan-dim); }
+  .comp-link:hover { background: var(--cyan-ghost); border-color: var(--cyan); color: var(--text); }
   .comp-price-col { text-align: right; flex-shrink: 0; }
 
   /* ============================================
@@ -874,7 +770,7 @@
      ============================================ */
   .market-gauge { padding: 1.5rem; margin-bottom: 1.5rem; }
   .gauge-title {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 0.65rem;
     letter-spacing: 3px;
     color: var(--text-muted);
@@ -892,7 +788,7 @@
     justify-content: space-between;
     align-items: center;
   }
-  .gauge-value { font-family: 'Space Mono', monospace; color: var(--text); }
+  .gauge-value { font-family: 'Inter', sans-serif; color: var(--text); }
   .gauge-bar-track {
     height: 6px;
     background: rgba(255,255,255,0.05);
@@ -905,7 +801,7 @@
     padding: 0.25rem 0.75rem;
     border: 1px solid;
     border-radius: 20px;
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.7rem;
     letter-spacing: 1px;
   }
@@ -915,7 +811,7 @@
      ============================================ */
   .transparency-section { margin-bottom: 1.5rem; }
   .transparency-toggle {
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'DM Serif Display', serif;
     font-size: 0.65rem;
     letter-spacing: 3px;
     color: var(--text-muted);
@@ -937,7 +833,7 @@
     margin: 0.75rem 0 0.5rem;
   }
   .transparency-query {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.72rem;
     color: var(--text-dim);
     padding: 0.4rem 0;
@@ -946,7 +842,7 @@
   .transparency-query::before { content: '\00BB  '; color: var(--cyan); }
   .source-link {
     display: inline-block;
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.65rem;
     color: var(--text-muted);
     text-decoration: none;
@@ -962,7 +858,7 @@
      TIMESTAMP / META
      ============================================ */
   .analysis-meta {
-    font-family: 'Space Mono', monospace;
+    font-family: 'Inter', sans-serif;
     font-size: 0.65rem;
     color: var(--text-muted);
     margin-top: 0.5rem;
@@ -1043,20 +939,20 @@
   body.pdf-mode {
     --abyss: #ffffff;
     --void: #f8f8f8;
-    --surface: #f0f0f0;
-    --surface-light: #e8e8e8;
-    --text: #1B2A4A;
-    --text-dim: #3a4a6a;
-    --text-muted: #6a7a9a;
+    --surface: #f8fafc;
+    --surface-light: #f0f4f8;
+    --text: #0F172A;
+    --text-dim: #334155;
+    --text-muted: #64748B;
     --cyan: #1B2A4A;
     --cyan-dim: rgba(27,42,74,0.4);
     --cyan-ghost: rgba(27,42,74,0.06);
-    --purple: #C4A265;
-    --purple-dim: rgba(196,162,101,0.4);
-    --amber: #C4A265;
-    --amber-dim: rgba(196,162,101,0.4);
-    --glass: rgba(255,255,255,0.95);
-    --glass-border: rgba(27,42,74,0.15);
+    --purple: #8B6914;
+    --purple-dim: rgba(139,105,20,0.4);
+    --amber: #8B6914;
+    --amber-dim: rgba(139,105,20,0.4);
+    --glass: #ffffff;
+    --glass-border: rgba(27,42,74,0.12);
     --glass-border-hover: rgba(27,42,74,0.3);
     background: white !important;
   }
@@ -1115,14 +1011,7 @@
 </head>
 <body>
 
-<!-- Background Effects -->
-<div class="bg-orbs">
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-  <div class="orb orb-3"></div>
-</div>
-<div class="grid-bg"></div>
-<div class="scanlines"></div>
+<!-- Clean background -->
 
 <div class="app">
 
@@ -1173,11 +1062,8 @@
   <!-- ========== LOADING ========== -->
   <div id="loadingSection" class="loading-section">
     <div class="glass">
-      <div class="radar-container">
-        <div class="radar-ring"></div>
-        <div class="radar-ring"></div>
-        <div class="radar-ring"></div>
-        <div class="radar-dot"></div>
+      <div class="spinner-container">
+        <div class="spinner"></div>
       </div>
       <div id="loadingStatus" class="loading-status">Initializing...</div>
       <div class="loading-sub">This typically takes 10-20 seconds</div>
@@ -1899,18 +1785,19 @@ function renderText(input, data) {
 function animateResults() {
   const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
 
-  tl.fromTo('.result-property', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 })
-    .fromTo('#execSummaryCard', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.2')
-    .fromTo('.range-card', { opacity: 0, y: 30, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.6 }, '-=0.3')
-    .fromTo('#adjPanel', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.2')
-    .fromTo('.section-label', { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.4, stagger: 0.12 }, '-=0.3')
-    .fromTo('.stat-box', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 }, '-=0.2')
-    .fromTo('#marketGauge', { opacity: 0, y: 15 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.1')
-    .fromTo('.comp-card', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.08 }, '-=0.2')
-    .fromTo('#searchTransparency', { opacity: 0 }, { opacity: 1, duration: 0.3 }, '-=0.1')
-    .fromTo('.analysis-box', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, '-=0.1')
-    .fromTo('.agent-footer', { opacity: 0 }, { opacity: 1, duration: 0.5 }, '-=0.2')
-    .fromTo('.action-row', { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, '-=0.1');
+  const ease = 'power2.out';
+  tl.fromTo('.result-property', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease })
+    .fromTo('#execSummaryCard', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease }, '-=0.2')
+    .fromTo('.range-card', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, ease }, '-=0.2')
+    .fromTo('#adjPanel', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease }, '-=0.2')
+    .fromTo('.section-label', { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.08, ease }, '-=0.2')
+    .fromTo('.stat-box', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.06, ease }, '-=0.15')
+    .fromTo('#marketGauge', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, ease }, '-=0.1')
+    .fromTo('.comp-card', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.05, ease }, '-=0.15')
+    .fromTo('#searchTransparency', { opacity: 0 }, { opacity: 1, duration: 0.3, ease }, '-=0.1')
+    .fromTo('.analysis-box', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, ease }, '-=0.1')
+    .fromTo('.agent-footer', { opacity: 0 }, { opacity: 1, duration: 0.4, ease }, '-=0.15')
+    .fromTo('.action-row', { opacity: 0 }, { opacity: 1, duration: 0.3, ease }, '-=0.1');
 
   // Counter animation for tier values
   document.querySelectorAll('.tier-value[data-target]').forEach(function(el) {
