@@ -1132,7 +1132,7 @@ function setType(btn) {
 // LOADING STATUS CYCLE
 // ============================================
 const statusMessages = [
-  'Scanning MLS database...',
+  'Searching public records...',
   'Locating comparable properties...',
   'Analyzing market conditions...',
   'Calculating price adjustments...',
@@ -1286,8 +1286,8 @@ function parseDollar(str) {
 function makeSearchLinks(address) {
   const enc = encodeURIComponent(address);
   return {
-    redfin: 'https://www.redfin.com/search?query=' + enc,
-    zillow: 'https://www.zillow.com/homes/' + enc + '_rb/'
+    redfin: 'https://www.google.com/search?q=' + enc + '+redfin',
+    zillow: 'https://www.google.com/search?q=' + enc + '+zillow'
   };
 }
 
